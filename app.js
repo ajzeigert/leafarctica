@@ -24,7 +24,8 @@ function init() {
     zoom: 0,
     // Projection set here
     crs: EPSG3031,
-    maxZoom: 5
+    maxZoom: 5,
+//		bounds: EPSG3031.bounds
   });
 	
 	// Adding claim data from geojson.xyz
@@ -34,33 +35,75 @@ function init() {
 	
 	// Antarctica boundary (downloaded and extracted)
 	$.getJSON('antarctica_boundary.geojson', function(data) {
-		L.geoJson(data).addTo(map);
+		L.geoJson(data, {
+			style: {
+				weight: 2,
+				fill: false,
+				color: '#000',
+				dashArray: '5,8',
+				lineCap: 'square',
+				opacity: 1
+			}
+		}).addTo(map);
 //		console.log(data);
 	});
 	
 	// Add Antarctic ice shelves from geojson.xyz
 	$.getJSON('http://geojson.xyz/naturalearth-3.3.0/ne_10m_antarctic_ice_shelves_polys.geojson', function(data) {
-		L.geoJson(data).addTo(map);
+		L.geoJson(data,{
+			style: {
+				stroke: false,
+				fillOpacity: 0.3
+			}
+		}).addTo(map);
 	});	
 	
 	// Add Antarctic ice sheets
-//	$.getJSON('ice_sheets.geojson', function(data) {
-//		L.geoJson(data).addTo(map);
+//	$.getJSON('ice_sheets.json', function(data) {
+//		console.log(data);
+//		var ice_sheets = topojson.object(data, data.objects.ice_sheets);
+//		console.log(ice_sheets);
+//		L.geoJson(ice_sheets).addTo(map);
 //	});
 	
 	// Add Antarctic stations
+	var stationMarker = L.MakiMarkers.icon({icon: "warehouse", color: "#208075", size: "s"});
+	
 	$.getJSON('stations.geojson', function(data) {
-		L.geoJson(data).addTo(map);
+//		console.log(data);
+		L.geoJson(data,{
+			pointToLayer: function(feature, latlng){
+				return L.marker(latlng, {icon: stationMarker, title: feature.properties.facility_n})
+			},
+			onEachFeature: function (feature, layer) {
+				layer.bindPopup(feature.properties.facility_n);
+    	}
+		}).addTo(map);
 	});
 	
 	// Add Antarctic camps
+	var campMarker = L.MakiMarkers.icon({icon: "campsite", color: "#a55", size: "s"});
+	
 	$.getJSON('camps.geojson', function(data) {
-		L.geoJson(data).addTo(map);
+//		console.log(data);
+		L.geoJson(data,{
+			pointToLayer: function(feature, latlng){
+				return L.marker(latlng, {icon: campMarker, title: feature.properties.hmn00nam})
+			}
+		}).addTo(map);
 	});
 	
-	// Add Antarctic camps
+	// Add historic points
+	
+	var historyMarker = L.MakiMarkers.icon({icon: "star-stroked", color: "#666", size: "s"});
+	
 	$.getJSON('historic_points.geojson', function(data) {
-		L.geoJson(data).addTo(map);
+		console.log(data);
+		L.geoJson(data, {
+			pointToLayer: function(feature, latlng){
+				return L.marker(latlng, {icon: historyMarker, title: feature.properties.brief_desc})
+			}
+		}).addTo(map);
 	});
 		
 	// Module which adds graticule (lat/lng lines)
@@ -69,7 +112,7 @@ function init() {
 	// MODIS layer is bugging out, will come back to that later
 // The URL definition
   var GIBSServiceUrl =
-    "http://map1{s}.vis.earthdata.nasa.gov/wmts-antarctic/{layer}/default/{time}/{tileMatrixSet}/{z}/{y}/{x}.jpg";
+    "https://map1{s}.vis.earthdata.nasa.gov/wmts-antarctic/{layer}/default/{time}/{tileMatrixSet}/{z}/{y}/{x}.jpg";
 
   // A function which generate a MODIS leaflet layer for a single datetime. We
   // need this because we need to generate a new layer when we change the
@@ -90,7 +133,7 @@ function init() {
         "<a href='https://github.com/nasa-gibs/web-examples/blob/release/leaflet/js/antarctic-epsg3031.js'>" +
       "View Source" +
         "</a>",
-			tms: true
+//			tms: true
     });
   }
 
