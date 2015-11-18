@@ -25,8 +25,14 @@ function init() {
     // Projection set here
     crs: EPSG3031,
     maxZoom: 10,
+		zoomControl: false
 //		bounds: EPSG3031.bounds
   });
+	
+	var control = L.control.zoom({
+		position: 'topright'
+	}).addTo(map);
+	
 	
 	// Adding claim data from geojson.xyz
 //	$.getJSON('http://geojson.xyz/naturalearth-3.3.0/ne_10m_admin_0_antarctic_claims.geojson', function(data) {
