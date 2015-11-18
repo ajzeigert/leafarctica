@@ -33,6 +33,23 @@ function init() {
 //		L.geoJson(data).addTo(map);
 //	});
 	
+	// Add Antarctic ice shelves from geojson.xyz
+	$.getJSON('http://geojson.xyz/naturalearth-3.3.0/ne_10m_antarctic_ice_shelves_polys.geojson', function(data) {
+		console.log(data)
+		L.geoJson(data,{
+			style: {
+				stroke: false,
+				fillOpacity: 0.7,
+				fillColor: "#7aa0b4"
+			},
+			onEachFeature: function(feature, layer){
+				layer.bindPopup(
+					'<h3>Antarctic ice sheet</h3>'
+				)
+			}
+		}).addTo(map);
+	});	
+	
 	// Antarctica boundary (downloaded and extracted)
 	$.getJSON('antarctica_boundary.geojson', function(data) {
 		L.geoJson(data, {
@@ -47,18 +64,6 @@ function init() {
 		}).addTo(map);
 //		console.log(data);
 	});
-	
-	// Add Antarctic ice shelves from geojson.xyz
-	$.getJSON('http://geojson.xyz/naturalearth-3.3.0/ne_10m_antarctic_ice_shelves_polys.geojson', function(data) {
-//		console.log(data)
-		L.geoJson(data,{
-			style: {
-				stroke: false,
-				fillOpacity: 0.7,
-				fillColor: "#7aa0b4"
-			}
-		}).addTo(map);
-	});	
 	
 	// Add Antarctic ice sheets
 //	$.getJSON('ice_sheets.json', function(data) {
