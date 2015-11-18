@@ -2,7 +2,7 @@ function init() {
 
   // Map resolutions that NASA GIBS specify
   var resolutions = [
-    8192, 4096, 2048, 1024, 512, 256
+    8192, 4096, 2048, 1024, 512, 256, 128
   ];
 
   // The polar projection
@@ -24,7 +24,7 @@ function init() {
     zoom: 0,
     // Projection set here
     crs: EPSG3031,
-    maxZoom: 5,
+    maxZoom: 10,
 //		bounds: EPSG3031.bounds
   });
 	
@@ -50,11 +50,12 @@ function init() {
 	
 	// Add Antarctic ice shelves from geojson.xyz
 	$.getJSON('http://geojson.xyz/naturalearth-3.3.0/ne_10m_antarctic_ice_shelves_polys.geojson', function(data) {
-		console.log(data)
+//		console.log(data)
 		L.geoJson(data,{
 			style: {
 				stroke: false,
-				fillOpacity: 0.3
+				fillOpacity: 0.7,
+				fillColor: "#7aa0b4"
 			}
 		}).addTo(map);
 	});	
@@ -77,7 +78,14 @@ function init() {
 				return L.marker(latlng, {icon: stationMarker, title: feature.properties.facility_n})
 			},
 			onEachFeature: function (feature, layer) {
-				layer.bindPopup('<p>' + feature.geometry.coordinates + '</p>');
+				layer.bindPopup(
+					'<h3>' + feature.properties.facilty_ty + '</h3>' +
+					'<p><strong>Name:</strong> ' + feature.properties.facility_n + '</p>' +
+					'<p><strong>First opened:</strong> ' + feature.properties.first_open + '</p>' +
+					'<p><strong>Country:</strong> ' + feature.properties.national_p + '</p>' +
+					'<p><strong>Peak population:</strong> ' + feature.properties.peak_popul + '</p>' +
+					'<p><strong>Notes:</strong> ' + feature.properties.notes + '</p>'
+				);
     	}
 		}).addTo(map);
 	});
@@ -90,6 +98,16 @@ function init() {
 		L.geoJson(data,{
 			pointToLayer: function(feature, latlng){
 				return L.marker(latlng, {icon: campMarker, title: feature.properties.hmn00nam})
+			},
+			onEachFeature: function (feature, layer) {
+				layer.bindPopup(
+					'<h3>Camp</h3>' +
+					'<p><strong>Type:</strong> ' + feature.properties.feature_ty + ', ' + feature.properties.temporal + '</p>' +
+					'<p><strong>First opened:</strong> ' + feature.properties.hmn00dat + '</p>' +
+					'<p><strong>Country:</strong> ' + feature.properties.hmn00nat + '</p>' +
+					'<p><strong>Capacity:</strong> ' + feature.properties.capacity + '</p>' +
+					'<p><strong>Notes:</strong> ' + feature.properties.notes + '</p>'
+				);
 			}
 		}).addTo(map);
 	});
@@ -99,10 +117,16 @@ function init() {
 	var historyMarker = L.MakiMarkers.icon({icon: "star-stroked", color: "#666", size: "s"});
 	
 	$.getJSON('historic_points.geojson', function(data) {
-		console.log(data);
+//		console.log(data);
 		L.geoJson(data, {
 			pointToLayer: function(feature, latlng){
 				return L.marker(latlng, {icon: historyMarker, title: feature.properties.brief_desc})
+			},
+			onEachFeature: function (feature, layer) {
+				layer.bindPopup(
+					'<h3>Historical marker</h3>' +
+					'<p><strong>Description:</strong> ' + feature.properties.full_descr + '</p>'
+				);
 			}
 		}).addTo(map);
 	});
