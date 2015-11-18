@@ -50,6 +50,7 @@ function init() {
 	
 	// Add Antarctic ice shelves from geojson.xyz
 	$.getJSON('http://geojson.xyz/naturalearth-3.3.0/ne_10m_antarctic_ice_shelves_polys.geojson', function(data) {
+		console.log(data)
 		L.geoJson(data,{
 			style: {
 				stroke: false,
@@ -76,7 +77,7 @@ function init() {
 				return L.marker(latlng, {icon: stationMarker, title: feature.properties.facility_n})
 			},
 			onEachFeature: function (feature, layer) {
-				layer.bindPopup(feature.properties.facility_n);
+				layer.bindPopup('<p>' + feature.geometry.coordinates + '</p>');
     	}
 		}).addTo(map);
 	});
