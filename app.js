@@ -41,7 +41,7 @@ function init() {
 	
 	// Add Antarctic ice shelves from geojson.xyz
 	$.getJSON('http://geojson.xyz/naturalearth-3.3.0/ne_10m_antarctic_ice_shelves_polys.geojson', function(data) {
-		console.log(data)
+//		console.log(data)
 		L.geoJson(data,{
 			style: {
 				stroke: false,
@@ -56,7 +56,7 @@ function init() {
 		}).addTo(map);
 	});	
 	
-	// Antarctica boundary (downloaded and extracted)
+	// Antarctica boundary (downloaded and extracted from geojson.xyz to avoid 4MB geojson load/filter)
 	$.getJSON('antarctica_boundary.geojson', function(data) {
 		L.geoJson(data, {
 			style: {
@@ -71,6 +71,8 @@ function init() {
 //		console.log(data);
 	});
 	
+	map.attributionControl.addAttribution("Boundary and ice shelf data via <a href='http://geojson.xyz'>geojson.xyz</a>")
+	
 	// Add Antarctic ice sheets
 //	$.getJSON('ice_sheets.json', function(data) {
 //		console.log(data);
@@ -82,9 +84,7 @@ function init() {
 	// Add Antarctic stations
 	var stationMarker = L.MakiMarkers.icon({icon: "warehouse", color: "#208075", size: "s"});
 	
-	$.getJSON('stations.geojson', function(data) {
-//		console.log(data);
-		L.geoJson(data,{
+	var stations = L.geoJson(null ,{
 			pointToLayer: function(feature, latlng){
 				return L.marker(latlng, {icon: stationMarker, title: feature.properties.facility_n})
 			},
@@ -99,14 +99,16 @@ function init() {
 				);
     	}
 		}).addTo(map);
+	
+	$.getJSON('stations.geojson', function(data) {
+//		console.log(data);
+		stations.addData(data); 
 	});
 	
 	// Add Antarctic camps
 	var campMarker = L.MakiMarkers.icon({icon: "campsite", color: "#a55", size: "s"});
 	
-	$.getJSON('camps.geojson', function(data) {
-//		console.log(data);
-		L.geoJson(data,{
+	var camps = L.geoJson(null, {
 			pointToLayer: function(feature, latlng){
 				return L.marker(latlng, {icon: campMarker, title: feature.properties.hmn00nam})
 			},
@@ -121,15 +123,17 @@ function init() {
 				);
 			}
 		}).addTo(map);
+	
+	$.getJSON('camps.geojson', function(data) {
+//		console.log(data);
+		camps.addData(data); 
 	});
 	
 	// Add historic points
 	
 	var historyMarker = L.MakiMarkers.icon({icon: "star-stroked", color: "#666", size: "s"});
 	
-	$.getJSON('historic_points.geojson', function(data) {
-//		console.log(data);
-		L.geoJson(data, {
+	var history = L.geoJson(null, {
 			pointToLayer: function(feature, latlng){
 				return L.marker(latlng, {icon: historyMarker, title: feature.properties.brief_desc})
 			},
@@ -140,8 +144,22 @@ function init() {
 				);
 			}
 		}).addTo(map);
+	
+	$.getJSON('historic_points.geojson', function(data) {
+//		console.log(data);
+		history.addData(data);
 	});
+	
+	map.attributionControl.addAttribution("Station, camp and historical marker data via <a href='http://add.antarctica.ac.uk/'>Antarctic Digital Database</a>")
 		
+	var overlays = {
+		"Historical markers": history,
+		"Camps": camps,
+		"Stations": stations
+	};
+	
+	var layerControl = L.control.layers(null, overlays).addTo(map);
+	
 	// Module which adds graticule (lat/lng lines)
   L.graticule().addTo(map);
 	
