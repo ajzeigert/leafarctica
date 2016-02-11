@@ -4,11 +4,28 @@ function init() {
   var resolutions = [
     8192, 4096, 2048, 1024, 512, 256, 128
   ];
+  
+  var newResolutions = [
+    238810.81335399998, 
+    119405.40667699999, 
+    59702.70333849987, 
+    29851.351669250063, 
+    14925.675834625032, 
+    7462.837917312516, 
+    3731.4189586563907, 
+    1865.709479328063, 
+    932.8547396640315, 
+    466.42736983214803, 
+    233.21368491607402, 
+    116.60684245803701, 
+    58.30342122888621, 
+    29.151710614575396
+  ]
 
   // The polar projection
   var EPSG3031 = new L.Proj.CRS('EPSG:3031', '+proj=stere +lat_0=-90 +lat_ts=-71 +lon_0=0 +k=1 +x_0=0 +y_0=0 +ellps=WGS84 +datum=WGS84 +units=m +no_defs', {
-    resolutions: resolutions,
-    origin: [-4194304, 4194304],
+    resolutions: newResolutions,
+    origin: [-3.369955099203E7, 3.369955101703E7 ],
     bounds: L.bounds (
       [-4194304, -4194304],
       [4194304, 4194304]
@@ -21,10 +38,10 @@ function init() {
     continuousWorld: true,
     worldCopyJump: false,
     center: [-90, 0],
-    zoom: 0,
+    zoom: 6,
     // Projection set here
     crs: EPSG3031,
-    maxZoom: 10,
+    maxZoom: 13,
 		zoomControl: false
 //		bounds: EPSG3031.bounds
   });
@@ -50,7 +67,7 @@ function init() {
 			},
 			onEachFeature: function(feature, layer){
 				layer.bindPopup(
-					'<h3>Antarctic ice sheet</h3>'
+					'<h3>Antarctic ice shelf</h3>'
 				)
 			}
 		}).addTo(map);
@@ -75,8 +92,8 @@ function init() {
 	
 	// Add Antarctic ice sheets
 //	$.getJSON('ice_sheets.json', function(data) {
-//		console.log(data);
-//		var ice_sheets = topojson.object(data, data.objects.ice_sheets);
+////		console.log(data);
+//		var ice_sheets = topojson.feature(data, data.objects.ice_sheets);
 //		console.log(ice_sheets);
 //		L.geoJson(ice_sheets).addTo(map);
 //	});
@@ -104,8 +121,8 @@ function init() {
 //		console.log(data);
 		stations.addData(data); 
 	});
-	
-	// Add Antarctic camps
+//	
+//	// Add Antarctic camps
 	var campMarker = L.MakiMarkers.icon({icon: "campsite", color: "#a55", size: "s"});
 	
 	var camps = L.geoJson(null, {
@@ -162,56 +179,64 @@ function init() {
 	
 	// Module which adds graticule (lat/lng lines)
   L.graticule().addTo(map);
+  
+  L.esri.tiledMapLayer({
+    url: 'http://services.arcgisonline.com/arcgis/rest/services/Polar/Antarctic_Imagery/MapServer',
+    continuousWorld: true,
+    minZoom: 0,
+    maxZoom: 14
+//    maxZoom: 15
+  }).addTo(map);
 	
 	// MODIS layer is bugging out, will come back to that later
 // The URL definition
-  var GIBSServiceUrl =
-    "https://map1{s}.vis.earthdata.nasa.gov/wmts-antarctic/{layer}/default/{time}/{tileMatrixSet}/{z}/{y}/{x}.jpg";
+//  var GIBSServiceUrl =
+//    "https://map1{s}.vis.earthdata.nasa.gov/wmts-antarctic/{layer}/default/{time}/{tileMatrixSet}/{z}/{y}/{x}.jpg";
 
   // A function which generate a MODIS leaflet layer for a single datetime. We
   // need this because we need to generate a new layer when we change the
   // datetime <input>
-  function genModisLayer(time){
-    return L.tileLayer(GIBSServiceUrl, {
-      layer: "MODIS_Aqua_CorrectedReflectance_TrueColor",
-      tileMatrixSet: "EPSG3031_250m",
-      format: "image%2Fjpeg",
-      time: time,
-      tileSize: 512,
-      subdomains: "abc",
-      noWrap: true,
-      continuousWorld: true,
-      attribution:
-        "<a href='https://earthdata.nasa.gov/gibs'>" +
-      "NASA EOSDIS GIBS</a>&nbsp;&nbsp;&nbsp;" +
-        "<a href='https://github.com/nasa-gibs/web-examples/blob/release/leaflet/js/antarctic-epsg3031.js'>" +
-      "View Source" +
-        "</a>",
-//			tms: true
-    });
-  }
+//  function genModisLayer(time){
+//    return L.tileLayer(GIBSServiceUrl, {
+//      layer: "MODIS_Aqua_CorrectedReflectance_TrueColor",
+//      tileMatrixSet: "EPSG3031_250m",
+//      format: "image%2Fjpeg",
+//      time: time,
+//      tileSize: 512,
+//      subdomains: "abc",
+//      noWrap: true,
+//      continuousWorld: true,
+//      attribution:
+//        "<a href='https://earthdata.nasa.gov/gibs'>" +
+//      "NASA EOSDIS GIBS</a>&nbsp;&nbsp;&nbsp;" +
+//        "<a href='https://github.com/nasa-gibs/web-examples/blob/release/leaflet/js/antarctic-epsg3031.js'>" +
+//      "View Source" +
+//        "</a>",
+////			tms: true
+//    });
+//  }
 
   // Get a reference to the <input type="date">
-  var dateEl = document.querySelector('#date');
+//  var dateEl = document.querySelector('#date');
 
   // On date change generate a new layer of the current date and remove the old layer
-  dateEl.addEventListener('change', function() {
-    map.removeLayer(modisLayer);
-    modisLayer = genModisLayer(dateEl.value);
-    map.addLayer(modisLayer);
-  })
+//  dateEl.addEventListener('change', function() {
+////    map.removeLayer(modisLayer);
+//    modisLayer = genModisLayer(dateEl.value);
+////    map.addLayer(modisLayer);
+//  })
 
   // Set the current <input type="date"> and generate the initial layer
-  var modisLayer = genModisLayer('2014-12-01')
-  dateEl.value = '2014-12-01';
+//  var modisLayer = genModisLayer('2014-12-01')
+//  dateEl.value = '2014-12-01';
 	
-	map.addLayer(modisLayer);
+//	map.addLayer(modisLayer);
 	
   // Module which add a url hash with the current lat/lng
   var hash = new L.Hash(map);
 	
   // Initialise bounds hack
-  constrainMapToBounds(map, EPSG3031, L.point(4194304, -4194304));
+//  constrainMapToBounds(map, EPSG3031, L.point(4194304, -4194304));
 
 }
 
